@@ -38,15 +38,13 @@ class TMDBApiTest {
     }
 
     private fun readSampleResponse(): String? {
-        var json: String? = null
-        try {
+        return try {
             val  inputStream:InputStream = javaClass.classLoader!!
                 .getResourceAsStream("SampleResponse.txt")
-            json = inputStream.bufferedReader().use{it.readText()}
+            inputStream.bufferedReader().use{it.readText()}
         } catch (ex: Exception) {
             ex.printStackTrace()
-            return null
+            null
         }
-        return json
     }
 }

@@ -6,8 +6,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -19,4 +22,12 @@ object AppModules {
     fun provideTMDBApi(): TMDBApi = Retrofit.Builder().baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create()).build()
         .create(TMDBApi::class.java)
+
+    @IoDispatcher
+    @Provides
+    fun provideDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class IoDispatcher
