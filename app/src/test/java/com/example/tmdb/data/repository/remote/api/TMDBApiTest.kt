@@ -12,6 +12,9 @@ import java.io.InputStream
 
 class TMDBApiTest {
 
+    private val POPULAR_MOVIES_RESPONSE = "PopularMoviesResponse.txt"
+    private val MOVIE_DETAILS_RESPONSE = "MovieDetailsResponse.txt"
+
     private val mockWebServer by lazy {
         MockWebServer()
     }
@@ -23,7 +26,8 @@ class TMDBApiTest {
     }
 
     @Test fun fetchPopularMoviesCallsCorrectEndpoint() = runTest {
-        mockWebServer.enqueue(MockResponse().setBody(readSampleResponse()!!).setResponseCode(200))
+        mockWebServer.enqueue(MockResponse()
+            .setBody(getResponseFromFile(POPULAR_MOVIES_RESPONSE)!!).setResponseCode(200))
         tMDBApi.fetchPopularMovies(page = 1)
         assertEquals("/3/movie/popular?api_key=${BuildConfig.API_KEY}&page=1",
             mockWebServer.takeRequest().path)
@@ -31,16 +35,35 @@ class TMDBApiTest {
 
     @Test
     fun fetchMoviesReturnsMovies() = runTest {
-        mockWebServer.enqueue(MockResponse().setBody(readSampleResponse()!!).setResponseCode(200))
+        mockWebServer.enqueue(MockResponse()
+            .setBody(getResponseFromFile(POPULAR_MOVIES_RESPONSE)!!).setResponseCode(200))
         val movies = tMDBApi.fetchPopularMovies(page = 1)
         assertEquals(20, movies.body()!!.movies.size)
         assertEquals("The Super Mario Bros. Movie", movies.body()!!.movies[0].title)
     }
 
-    private fun readSampleResponse(): String? {
+    @Test
+    fun fetchMovieDetailsCallsCorrectEndpoint() = runTest {
+        var movieId = 1
+        mockWebServer.enqueue(MockResponse()
+            .setBody(getResponseFromFile(MOVIE_DETAILS_RESPONSE)!!).setResponseCode(200))
+        tMDBApi.fetchMovieDetails(movieId = 1)
+        assertEquals("/3/movie/$movieId?api_key=${BuildConfig.API_KEY}",
+            mockWebServer.takeRequest().path)
+    }
+
+    @Test
+    fun fetchMovieDetailsReturnMovieDetails() = runTest {
+        mockWebServer.enqueue(MockResponse()
+            .setBody(getResponseFromFile(MOVIE_DETAILS_RESPONSE)!!).setResponseCode(200))
+        val movieDetails = tMDBApi.fetchMovieDetails(movieId = 1)
+        assertEquals("/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", movieDetails.body()!!.posterPath)
+    }
+
+    private fun getResponseFromFile(fileName: String): String? {
         return try {
             val  inputStream:InputStream = javaClass.classLoader!!
-                .getResourceAsStream("SampleResponse.txt")
+                .getResourceAsStream(fileName)
             inputStream.bufferedReader().use{it.readText()}
         } catch (ex: Exception) {
             ex.printStackTrace()

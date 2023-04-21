@@ -55,7 +55,7 @@ class RemoteDataSourceTest {
     private fun getSuccessMovieResponse(): MovieResponse? {
         return try {
             val inputStream: InputStream = javaClass.classLoader!!
-                .getResourceAsStream("SampleResponse.txt")
+                .getResourceAsStream("PopularMoviesResponse.txt")
             val json = inputStream.bufferedReader().use { it.readText() }
             Gson().fromJson(json, MovieResponse::class.java)
         } catch (ex: Exception) {

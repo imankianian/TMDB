@@ -13,3 +13,8 @@ sealed interface MoviesResult {
     data class Error(val code: Int?, val message: String?): MoviesResult
     data class Failure(val message: String?): MoviesResult
 }
+
+data class Genre(
+    val id: Int,
+    val name: String
+)
