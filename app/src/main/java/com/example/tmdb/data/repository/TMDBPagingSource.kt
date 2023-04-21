@@ -9,6 +9,7 @@ import com.example.tmdb.data.repository.remote.datasource.RemoteDataSource
 import com.example.tmdb.data.repository.remote.model.Movie
 import com.example.tmdb.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -19,6 +20,9 @@ class TMDBPagingSource @Inject constructor(
 
     override suspend fun load(params: LoadParams<Int>) = withContext(dispatcher) {
         val position = params.key ?: STARTING_PAGE_INDEX
+
+        // Adding this delay intentionally to simulate network delay and show progress indicator
+        delay(2000)
         when (val response = remoteDataSource.fetchPopularMovies(position)) {
             is MoviesResult.Success -> {
                 val nextKey = if (response.movieResponse.movies.isEmpty()) {

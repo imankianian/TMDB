@@ -6,6 +6,7 @@ const val BASE_URL = "https://api.themoviedb.org"
 const val TAG = "TMDB ==>"
 const val STARTING_PAGE_INDEX = 1
 const val PAGE_SIZE = 10
+const val IMAGE_PATH = "https://image.tmdb.org/t/p/w500"
 
 sealed interface MoviesResult {
     data class Success(val movieResponse: MovieResponse): MoviesResult
