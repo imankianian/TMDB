@@ -1,5 +1,6 @@
 package com.example.tmdb
 
+import com.example.tmdb.data.repository.remote.model.MovieDetails
 import com.example.tmdb.data.repository.remote.model.MovieResponse
 
 const val BASE_URL = "https://api.themoviedb.org"
@@ -18,3 +19,9 @@ data class Genre(
     val id: Int,
     val name: String
 )
+
+sealed interface MovieDetailsResult {
+    data class Success(val movieDetails: MovieDetails): MovieDetailsResult
+    data class Error(val code: Int?, val message: String?): MovieDetailsResult
+    data class Failure(val message: String?): MovieDetailsResult
+}

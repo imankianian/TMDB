@@ -1,6 +1,8 @@
 package com.example.tmdb.data.repository.remote.api
 
 import com.example.tmdb.BuildConfig
+import com.example.tmdb.MOVIE_DETAILS_RESPONSE
+import com.example.tmdb.POPULAR_MOVIES_RESPONSE
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -11,9 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.InputStream
 
 class TMDBApiTest {
-
-    private val POPULAR_MOVIES_RESPONSE = "PopularMoviesResponse.txt"
-    private val MOVIE_DETAILS_RESPONSE = "MovieDetailsResponse.txt"
 
     private val mockWebServer by lazy {
         MockWebServer()

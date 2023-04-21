@@ -1,7 +1,11 @@
 package com.example.tmdb.data.repository.remote.datasource
 
+import com.example.tmdb.MOVIE_DETAILS_RESPONSE
+import com.example.tmdb.MovieDetailsResult
 import com.example.tmdb.MoviesResult
+import com.example.tmdb.POPULAR_MOVIES_RESPONSE
 import com.example.tmdb.data.repository.remote.api.TMDBApi
+import com.example.tmdb.data.repository.remote.model.MovieDetails
 import com.example.tmdb.data.repository.remote.model.MovieResponse
 import com.google.gson.Gson
 import junit.framework.Assert.assertEquals
@@ -29,7 +33,9 @@ class RemoteDataSourceTest {
 
     @Test
     fun fetchPopularMoviesReceivesMoviesIfResponseWasSuccessful() = runTest(dispatcher) {
-        whenever(tMDBApi.fetchPopularMovies(page = 1)).thenReturn(Response.success(getSuccessMovieResponse()))
+        whenever(tMDBApi.fetchPopularMovies(page = 1))
+            .thenReturn(Response.success(getSuccessResponse(POPULAR_MOVIES_RESPONSE,
+                MovieResponse::class.java)))
         val response = remoteDataSource.fetchPopularMovies(page = 1)
         assertEquals("The Super Mario Bros. Movie",
             (response as MoviesResult.Success).movieResponse.movies[0].title)
@@ -38,8 +44,8 @@ class RemoteDataSourceTest {
     @Test
     fun fetchPopularMoviesReceivesErrorIfResponseWasError() = runTest(dispatcher) {
         val errorCode = 404
-        whenever(tMDBApi.fetchPopularMovies(page = 1)).thenReturn(Response.error(errorCode,
-            "".toResponseBody()))
+        whenever(tMDBApi.fetchPopularMovies(page = 1))
+            .thenReturn(Response.error(errorCode, "".toResponseBody()))
         val response = remoteDataSource.fetchPopularMovies(page = 1)
         assertEquals(errorCode, (response as MoviesResult.Error).code)
     }
@@ -52,12 +58,45 @@ class RemoteDataSourceTest {
         assertEquals(failureMessage, (response as MoviesResult.Failure).message)
     }
 
-    private fun getSuccessMovieResponse(): MovieResponse? {
+    @Test
+    fun fetchMovieDetailsCallsTMDBApifetchMovieDetails() = runTest(dispatcher) {
+        remoteDataSource.fetchMovieDetails(movieId = 1)
+        verify(tMDBApi).fetchMovieDetails(movieId = 1)
+    }
+
+    @Test
+    fun fetchMovieDetailsReturnsMovieDetailsIfResponseWasSuccessful() = runTest(dispatcher) {
+        whenever(tMDBApi.fetchMovieDetails(movieId = 1))
+            .thenReturn(Response.success(getSuccessResponse(MOVIE_DETAILS_RESPONSE,
+                MovieDetails::class.java)))
+        val response = remoteDataSource.fetchMovieDetails(movieId = 1)
+        assertEquals("/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
+            (response as MovieDetailsResult.Success).movieDetails.posterPath)
+    }
+
+    @Test
+    fun fetchMovieDetailsReturnsErrorIfResponseWasError() = runTest(dispatcher) {
+        val errorCode = 404
+        whenever(tMDBApi.fetchMovieDetails(movieId = 1))
+            .thenReturn(Response.error(errorCode, "".toResponseBody()))
+        val response = remoteDataSource.fetchMovieDetails(movieId = 1)
+        assertEquals(errorCode, (response as MovieDetailsResult.Error).code)
+    }
+
+    @Test
+    fun fetchMovieDetailsReturnsFailureIfResponseWasFailure() = runTest(dispatcher) {
+        val failureMessage = "Wrong State"
+        whenever(tMDBApi.fetchMovieDetails(movieId = 1)).thenThrow(IllegalStateException(failureMessage))
+        val response = remoteDataSource.fetchMovieDetails(movieId = 1)
+        assertEquals(failureMessage, (response as MovieDetailsResult.Failure).message)
+    }
+
+    private fun<T> getSuccessResponse(fileName: String, destination: Class<T>): T? {
         return try {
             val inputStream: InputStream = javaClass.classLoader!!
-                .getResourceAsStream("PopularMoviesResponse.txt")
+                .getResourceAsStream(fileName)
             val json = inputStream.bufferedReader().use { it.readText() }
-            Gson().fromJson(json, MovieResponse::class.java)
+            Gson().fromJson(json, destination)
         } catch (ex: Exception) {
             ex.printStackTrace()
             null

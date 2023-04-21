@@ -1,6 +1,7 @@
 package com.example.tmdb.data.repository.remote.datasource
 
 import android.util.Log
+import com.example.tmdb.MovieDetailsResult
 import com.example.tmdb.MoviesResult
 import com.example.tmdb.TAG
 import com.example.tmdb.data.repository.remote.api.TMDBApi
@@ -27,6 +28,21 @@ class RemoteDataSourceImpl @Inject constructor(
         } catch (exception: Exception) {
             Log.d(TAG, "API response -> Failure")
             MoviesResult.Failure(exception.message)
+        }
+    }
+
+    override suspend fun fetchMovieDetails(movieId: Int) = withContext(dispatcher) {
+        try {
+            val response = tMDBApi.fetchMovieDetails(movieId)
+            if (response.isSuccessful && response.body() != null) {
+                Log.d(TAG, "API response -> Success")
+                MovieDetailsResult.Success(response.body()!!)
+            } else {
+                Log.d(TAG, "API response -> Error")
+                MovieDetailsResult.Error(response.code(), response.message())
+            }
+        } catch (exception: Exception) {
+            MovieDetailsResult.Failure(exception.message)
         }
     }
 }
