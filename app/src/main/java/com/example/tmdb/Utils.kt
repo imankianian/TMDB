@@ -1,7 +1,9 @@
 package com.example.tmdb
 
+import android.util.Log
 import com.example.tmdb.data.repository.remote.model.MovieDetails
 import com.example.tmdb.data.repository.remote.model.MovieResponse
+import kotlin.text.Typography.bullet
 
 const val BASE_URL = "https://api.themoviedb.org"
 const val TAG = "TMDB ==>"
@@ -24,4 +26,10 @@ sealed interface MovieDetailsResult {
     data class Success(val movieDetails: MovieDetails): MovieDetailsResult
     data class Error(val code: Int?, val message: String?): MovieDetailsResult
     data class Failure(val message: String?): MovieDetailsResult
+}
+
+sealed interface UiState {
+    object Loading: UiState
+    data class Success(val movieDetails: MovieDetails): UiState
+    data class Error(val message: String?): UiState
 }
