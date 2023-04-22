@@ -17,7 +17,7 @@ class RemoteDataSourceImpl @Inject constructor(
 
     override suspend fun fetchPopularMovies(page: Int) = withContext(dispatcher) {
         try {
-            val response = tMDBApi.fetchPopularMovies(page = 1)
+            val response = tMDBApi.fetchPopularMovies(page = page)
             if (response.isSuccessful && response.body() != null) {
                 Log.d(TAG, "API response -> Success")
                 MoviesResult.Success(response.body()!!)
