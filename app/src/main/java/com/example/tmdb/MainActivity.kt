@@ -12,8 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.tmdb.ui.screen.MovieDetailsScreen
 import com.example.tmdb.ui.screen.MoviesScreen
 import com.example.tmdb.ui.theme.TMDBTheme
+import com.example.tmdb.ui.viewmodel.MovieDetailsViewModel
 import com.example.tmdb.ui.viewmodel.MoviesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,7 +35,13 @@ class MainActivity : ComponentActivity() {
                         composable(Routes.Movies.route) {
                             val moviesViewModel = hiltViewModel<MoviesViewModel>()
                             val movies = moviesViewModel.getMovies().collectAsLazyPagingItems()
-                            MoviesScreen(movies)
+                            MoviesScreen(movies) { movieId ->
+                                navController.navigate("Movie/$movieId")
+                            }
+                        }
+                        composable(Routes.MovieDetails.route) {
+                            val movieDetailsViewModel = hiltViewModel<MovieDetailsViewModel>()
+                            MovieDetailsScreen(movieDetailsViewModel)
                         }
                     }
                 }
@@ -44,4 +52,5 @@ class MainActivity : ComponentActivity() {
 
 sealed class Routes(val route: String) {
     object Movies: Routes("Movies")
+    object MovieDetails: Routes("Movie/{movie_id}")
 }

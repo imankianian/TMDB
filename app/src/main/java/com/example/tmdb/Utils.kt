@@ -9,7 +9,8 @@ const val BASE_URL = "https://api.themoviedb.org"
 const val TAG = "TMDB ==>"
 const val STARTING_PAGE_INDEX = 1
 const val PAGE_SIZE = 10
-const val IMAGE_PATH = "https://image.tmdb.org/t/p/w500"
+const val MOVIES_IMAGE_PATH = "https://image.tmdb.org/t/p/w500"
+const val MOVIE_DETAILS_IMAGE_PATH = "https://image.tmdb.org/t/p/original"
 
 sealed interface MoviesResult {
     data class Success(val movieResponse: MovieResponse): MoviesResult
@@ -32,4 +33,18 @@ sealed interface UiState {
     object Loading: UiState
     data class Success(val movieDetails: MovieDetails): UiState
     data class Error(val message: String?): UiState
+}
+
+fun getGenresString(genres: List<Genre>): String {
+    var result = StringBuilder()
+    result.append("$bullet ")
+    genres.forEachIndexed { index, genre ->
+        if (index > 0) {
+            result.append(", ")
+        }
+        result.append(" ${genre.name}")
+    }
+    result.append(" $bullet")
+    Log.d(TAG, result.toString())
+    return result.toString()
 }

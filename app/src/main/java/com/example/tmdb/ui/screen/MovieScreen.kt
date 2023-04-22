@@ -1,6 +1,7 @@
 package com.example.tmdb.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,17 +17,17 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
-import com.example.tmdb.IMAGE_PATH
+import com.example.tmdb.MOVIES_IMAGE_PATH
 import com.example.tmdb.R
 import com.example.tmdb.data.repository.remote.model.Movie
 
 @Composable
-fun MoviesScreen(movies: LazyPagingItems<Movie>) {
-    DisplayMovies(movies)
+fun MoviesScreen(movies: LazyPagingItems<Movie>, onMovieClicked: (Int) -> Unit) {
+    DisplayMovies(movies, onMovieClicked)
 }
 
 @Composable
-fun DisplayMovies(movies: LazyPagingItems<Movie>) {
+fun DisplayMovies(movies: LazyPagingItems<Movie>, onMovieClicked: (Int) -> Unit) {
     Column {
         when (val state = movies.loadState.refresh) {
             is LoadState.Loading -> { // Loading UI
@@ -54,7 +55,7 @@ fun DisplayMovies(movies: LazyPagingItems<Movie>) {
             modifier = Modifier.padding(5.dp)) {
             items(count = movies.itemCount) { index ->
                 movies[index]?.let { movie ->
-                    DisplayMovie(movie)
+                    DisplayMovie(movie, onMovieClicked)
                 }
             }
             when (val state = movies.loadState.append) {
@@ -88,14 +89,15 @@ fun DisplayMovies(movies: LazyPagingItems<Movie>) {
 }
 
 @Composable
-fun DisplayMovie(movie: Movie) {
+fun DisplayMovie(movie: Movie, onMovieClicked: (Int) -> Unit) {
     Column(modifier = Modifier
         .width(185.dp)
         .padding(5.dp)
         .clip(RoundedCornerShape(10.dp))
-        .background(Color(0xff1a1a1a))) {
+        .background(Color(0xff1a1a1a))
+        .clickable { onMovieClicked(movie.id) }) {
         movie.posterPath?.let { poster ->
-            AsyncImage(model = IMAGE_PATH + poster,
+            AsyncImage(model = MOVIES_IMAGE_PATH + poster,
                 contentDescription = "movie poster",
                 modifier = Modifier.width(190.dp))
         }
